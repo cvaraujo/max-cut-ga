@@ -1,0 +1,4 @@
+/home/carlos/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/193.5233.103/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/carlos/CLionProjects/GeneticAlgorithmMaxCut
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/carlos/CLionProjects/GeneticAlgorithmMaxCut/cmake-build-debug

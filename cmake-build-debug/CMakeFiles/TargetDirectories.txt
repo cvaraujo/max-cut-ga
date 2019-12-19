@@ -1,0 +1,3 @@
+/home/carlos/CLionProjects/GeneticAlgorithmMaxCut/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/carlos/CLionProjects/GeneticAlgorithmMaxCut/cmake-build-debug/CMakeFiles/GA.dir
+/home/carlos/CLionProjects/GeneticAlgorithmMaxCut/cmake-build-debug/CMakeFiles/edit_cache.dir
