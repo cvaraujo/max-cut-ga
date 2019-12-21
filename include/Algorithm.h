@@ -10,9 +10,9 @@
 
 
 class Algorithm {
-    static constexpr double uniformRate = 0.5;
-    static constexpr double mutationRate = 0.01;
-    static const int tournamentSize = 5;
+    static constexpr double uniformRate = 0.4;
+    static constexpr double mutationRate = 0.1;
+    static const int tournamentSize = 4;
 
     static Individual *defaultCrossover(Individual *individual1, Individual *individual2);
 

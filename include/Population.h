@@ -31,7 +31,7 @@ public:
 
     void sortPopulation();
 
-    void getOnly(int max);
+    void getOnly(int popSize, int newInd);
 
     void setSize(int size);
 

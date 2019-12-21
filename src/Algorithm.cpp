@@ -6,81 +6,100 @@
 
 
 void Algorithm::defaultEvolvePopulation(Population *population, int newInd) {
-    population->setIndividual(0, population->getFittest());
+    int selected, toMutation = int((population->getSize()) * 0.2);
 
     // Crossover to make new individuals
     for (int i = 0; i < newInd; i++)
         population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
 
-    for (int i = 1; i < population->getSize(); i++)
-        defaultMutation(population->getIndividual(i));
+    for (int i = 0; i < toMutation; i++) {
+        selected = int(random() % population->getSize());
+        if (selected != 0) defaultMutation(population->getIndividual(selected));
+    }
 
-    population->getOnly(population->getSize() - newInd);
+    population->setIndividual(0, population->getFittest());
+    population->getOnly(population->getSize(), newInd);
 }
 
 void Algorithm::constrainedEvolvePopulation(class Population *population, int newInd) {
-    population->setIndividual(0, population->getFittest());
+    int selected, toMutation = int((population->getSize()) * 0.2);
 
     // Crossover to make new individuals
     for (int i = 0; i < newInd; i++)
         population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
 
-    for (int i = 1; i < population->getSize(); i++)
-        constrainedMutation(population->getIndividual(i));
+    for (int i = 0; i < toMutation; i++) {
+        selected = int(random() % population->getSize());
+        if (selected != 0)
+            constrainedMutation(population->getIndividual(selected));
+    }
 
-    population->getOnly(population->getSize() - newInd);
+    population->setIndividual(0, population->getFittest());
+    population->getOnly(population->getSize(), newInd);
 }
 
 void Algorithm::hybridEvolvePopulation(class Population *population, int newInd) {
-    population->setIndividual(0, population->getFittest());
+    int selected, toMutation = int((population->getSize()) * 0.25);
 
-    // Crossover to make new individuals
+    // Crossover
     for (int i = 0; i < newInd; i++)
         population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
 
-    for (int i = 1; i < population->getSize(); i++)
-        defaultMutation(population->getIndividual(i));
+    // Mutation
+    for (int i = 0; i < toMutation; i++) {
+        selected = int(random() % population->getSize());
+        if (selected != 0) defaultMutation(population->getIndividual(selected));
+    }
 
-    for (int i = 1; i < population->getSize(); i++)
-        if (drand48() < mutationRate / 2)
-            constrainedMutation(population->getIndividual(i));
+    // Constrained Mutation
+    for (int i = 0; i < toMutation; i++) {
+        selected = int(random() % population->getSize());
+        if (selected != 0) constrainedMutation(population->getIndividual(selected));
+    }
 
-    population->getOnly(population->getSize() - newInd);
+    // Eletism on the best individual
+    population->setIndividual(0, population->getFittest());
+
+    // Remove the excess
+    population->getOnly(population->getSize(), newInd);
+
 }
 
 Individual *Algorithm::defaultCrossover(Individual *individual1, Individual *individual2) {
-    auto *child = new Individual(*individual1);
+    auto *child = new Individual((individual1->getFitness() > individual2->getFitness()) ? *individual1 : *individual2);
 
     for (int i = 0; i < individual1->getSize(); i++) {
         if (child->getGene(i) == individual2->getGene(i)) continue;
-        if (drand48() >= uniformRate) child->setGene(i);
+        else if (drand48() < uniformRate) child->setGene(i);
     }
     return child;
 }
 
 void Algorithm::defaultMutation(Individual *individual) {
     for (int i = 0; i < individual->getSize(); i++)
-        if (drand48() <= mutationRate) individual->setGene(i);
+        if (individual->getChg(i) >= 0 || drand48() < mutationRate) individual->setGene(i);
 }
 
 void Algorithm::constrainedMutation(Individual *individual) {
     int fixed = -1, n = individual->getSize();
     bool fixVertex;
 
-    fixVertex = drand48() < 0.5;
+    fixVertex = drand48() < 0.6;
     if (fixVertex) fixed = int(random() % n);
 
     individual->constrainedMutation(fixed);
 }
 
 Individual *Algorithm::tournament(Population *population) {
-    auto *tournament = new Population(tournamentSize);
+    auto *individual = new Individual(nullptr, false, false);
+    int selected = 0;
 
-    for (int i = 0; i < population->getSize() && tournament->getSize() < tournamentSize; i++)
-        if (drand48() <= 0.4) tournament->appendIndividual(population->getIndividual(i));
+    for (int i = 0; i < tournamentSize; i++) {
+        selected = int(random() % population->getSize());
+        if (individual->getFitness() < population->getIndividual(selected)->getFitness()) {
+            individual = population->getIndividual(selected);
+        }
+    }
 
-    if (!tournament->getSize())
-        return population->getIndividual(population->getSize() - 1);
-
-    return tournament->getFittest();
+    return individual;
 }

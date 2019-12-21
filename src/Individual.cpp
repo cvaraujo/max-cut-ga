@@ -5,24 +5,27 @@
 #include "../include/Individual.h"
 
 Individual::Individual(Graph *graph, bool initialSolution, bool isDefault) {
-    this->fitness = 0.0;
-    this->graph = graph;
-    int n = graph->getN();
+    if (graph != nullptr) {
+        this->fitness = 0.0;
+        this->graph = graph;
+        int n = graph->getN();
 
-    chg = vector<int>(n);
-    side = vector<bool>(n);
-    gene = vector<bool>(n);
-    cx = vector<int>(n);
+        chg = vector<int>(n);
+        side = vector<bool>(n);
+        gene = vector<bool>(n);
+        cx = vector<int>(n);
 
-    for (int i = 0; i < graph->getN(); i++) {
-        chg[i] = graph->getChg(i), gene[i] = false, side[i] = false, cx[i] = 0;
+        for (int i = 0; i < graph->getN(); i++) {
+            chg[i] = graph->getChg(i), gene[i] = false, side[i] = false, cx[i] = 0;
+        }
+
+        if (initialSolution) {
+            if (isDefault) defaultSolution();
+            else constrainedSolution();
+        }
+    } else {
+        this->fitness = numeric_limits<int>::min();
     }
-
-    if (initialSolution) {
-        if (isDefault) defaultSolution();
-        else constrainedSolution();
-    }
-
 }
 
 void Individual::constrainedSolution() {

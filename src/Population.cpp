@@ -14,8 +14,11 @@ void Population::initPopDefault(Graph *graph) {
 }
 
 void Population::initPopConstrained(class Graph *graph) {
-    for (int i = 0; i < this->populationSize; i++)
+    for (int i = 0; i < this->populationSize; i++) {
         population.push_back(new Individual(graph, true, false));
+        cout << population[i]->getFitness() << ", ";
+    }
+    cout << endl;
 }
 
 void Population::initPopMixed(class Graph *graph, int numConst) {
@@ -54,10 +57,12 @@ Individual *Population::getFittest() {
     return fittest;
 }
 
-void Population::getOnly(int max) {
-    sortPopulation();
-    if (this->population.begin() + max < this->population.end())
-        this->population.erase(this->population.begin() + max, this->population.end());
+void Population::getOnly(int popSize, int newInd) {
+    sort(this->population.begin() + (popSize - 2 * newInd), this->population.end(),
+         [](Individual *i1, Individual *i2) { return i1->getFitness() > i2->getFitness(); });
+
+    this->population.erase(this->population.begin() + (popSize - newInd), this->population.end());
+
 }
 
 int Population::getSize() {
