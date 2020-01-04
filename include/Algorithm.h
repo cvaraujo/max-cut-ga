@@ -10,9 +10,9 @@
 
 
 class Algorithm {
-    static constexpr double uniformRate = 0.4;
-    static constexpr double mutationRate = 0.1;
-    static const int tournamentSize = 4;
+    static constexpr double uniformRate = 0.5;
+    static constexpr double mutationRate = 0.05;
+    static const int tournamentSize = 5;
 
     static Individual *defaultCrossover(Individual *individual1, Individual *individual2);
 
@@ -21,6 +21,8 @@ class Algorithm {
     static void constrainedMutation(Individual *individual);
 
     static Individual *tournament(Population *population);
+
+    static void localOptimization(Individual *individual);
 
 public:
     static void defaultEvolvePopulation(Population *population, int newInd);

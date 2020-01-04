@@ -15,6 +15,8 @@ class Population {
 public:
     Population(int size);
 
+    void reset(Graph *graph, int size);
+
     void initPopDefault(Graph *graph);
 
     void initPopConstrained(Graph *graph);
