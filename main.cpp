@@ -29,7 +29,7 @@ double defaultGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, 
 
     auto population = new Population(populationSize);
     population->initPopDefault(graph);
-
+    end = chrono::steady_clock::now();
     auto *fittest = population->getFittest();
 
     int generations = 0;
@@ -66,7 +66,7 @@ double initialPopulationGeneticAlgorithm(Graph *graph, int timeLimit, int popula
 
     auto population = new Population(populationSize);
     population->initPopConstrained(graph);
-
+    end = chrono::steady_clock::now();
     int generations = 0;
 
     cout << "Initial Constrained population with size " << populationSize << endl;
@@ -77,7 +77,9 @@ double initialPopulationGeneticAlgorithm(Graph *graph, int timeLimit, int popula
 
     solution << populationSize << " " << newIndividuals << " " << timeLimit << endl;
     solution << population->getFittest()->getFitness() << endl;
-
+//    for (int i = 0; i < populationSize; i++) cout << population->getIndividual(i)->getFitness() << endl;
+//    cout << chrono::duration_cast<chrono::seconds>(end - start).count() << endl;
+//    getchar();
     while (chrono::duration_cast<chrono::seconds>(end - start).count() < timeLimit) {
         Algorithm::defaultEvolvePopulation(population, newIndividuals);
         generations++;
@@ -90,8 +92,7 @@ double initialPopulationGeneticAlgorithm(Graph *graph, int timeLimit, int popula
     return population->getFittest()->getFitness();
 }
 
-double
-mutationGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int newIndividuals, string solutionPath) {
+double mutationGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int newIndividuals, string solutionPath) {
     ofstream solution;
     solution.open(solutionPath);
 
@@ -125,8 +126,7 @@ mutationGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int ne
     return population->getFittest()->getFitness();
 }
 
-double
-hybridGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int newIndividuals, const string solutionPath) {
+double hybridGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int newIndividuals, const string solutionPath) {
     ofstream solution;
     solution.open(solutionPath);
 
@@ -149,6 +149,7 @@ hybridGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, int newI
 
     while (chrono::duration_cast<chrono::seconds>(end - start).count() < timeLimit) {
         Algorithm::hybridEvolvePopulation(population, newIndividuals);
+	cout << population->getFittest()->getFitness() << endl;
         generations++;
         end = chrono::steady_clock::now();
     }

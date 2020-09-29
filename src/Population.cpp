@@ -13,13 +13,13 @@ void Population::initPopDefault(Graph *graph) {
         population.push_back(new Individual(graph, true, true));
 }
 
-void Population::initPopConstrained(class Graph *graph) {
+void Population::initPopConstrained(Graph *graph) {
     for (int i = 0; i < this->populationSize; i++) {
         population.push_back(new Individual(graph, true, false));
     }
 }
 
-void Population::initPopMixed(class Graph *graph, int numConst) {
+void Population::initPopMixed(Graph *graph, int numConst) {
     int numDefault = this->populationSize - numConst;
 
     for (int i = 0; i < numDefault; i++)
