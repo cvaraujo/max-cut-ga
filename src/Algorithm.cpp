@@ -52,20 +52,38 @@ void Algorithm::constrainedEvolvePopulation(class Population *population, int ne
 }
 
 void Algorithm::hybridEvolvePopulation(class Population *population, int newInd) {
-  int selected, toMutation = int((population->getSize()) * 0.3);
-  int i;
-  // Crossover
-  for (i = 0; i < newInd; i++)
-    population->appendIndividual(multiParentCrossover(population, 2 + int(random() % 2)));
-  //population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
-  // for (int i = population->getSize()  - newInd; i < population->getSize(); i++)
-  //   cout << population->getIndividual(i)->getFitness() << ", ";
-  // cout << endl;
-  // getchar();
-  // Optimization
-  for (i = population->getSize() - newInd; i < population->getSize(); i++) {
-    localOptimization(population->getIndividual(i));
+  int selected, toMutation = int((population->getSize()) * 0.2);
+  int i, j, numIns = 0, p = population->getSize()-1;
+  double worst = population->getIndividual(p)->getFitness();
+  bool push;
+  
+  for (i = 0; i < newInd; i++) {
+    Individual *ind = multiParentCrossover(population, 3 + int(random() % 2));
+    localOptimization(ind);
+    
+    if (ind->getFitness() > worst) {
+      push = true;
+      for (j = 0; j < population->getSize(); j++){
+	if (ind->getFitness() == population->getIndividual(j)->getFitness()) {
+	  push = false;
+	  break;
+	}
+      }
+      if(push) {
+	numIns++;
+	population->appendIndividual(ind);
+      }
+    }
   }
+  
+  // Crossover
+  //for (i = 0; i < newInd; i++)
+  //  population->appendIndividual(multiParentCrossover(population, 3 + int(random() % 2)));
+  
+  //for (i = population->getSize() - newInd; i < population->getSize(); i++) {
+  //  localOptimization(population->getIndividual(i));
+  //}
+  
   for (i = 0; i < toMutation; i++) {
     selected = int(random() % population->getSize());
     if (selected != 0) constrainedMutation(population->getIndividual(selected));
@@ -77,10 +95,10 @@ void Algorithm::hybridEvolvePopulation(class Population *population, int newInd)
   }
 
   // Eletism on the best individual
-  population->setIndividual(0, population->getFittest());
+  //population->setIndividual(0, population->getFittest());
 
   // Remove the excess
-  population->getOnly(population->getSize(), newInd);
+  population->getOnly(population->getSize(), numIns);
   //getchar();
 }
 
