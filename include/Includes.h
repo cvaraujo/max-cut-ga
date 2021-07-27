@@ -10,7 +10,6 @@
 #include <random>
 #include <algorithm>
 #include <stdlib.h>
-#include <gmpxx.h>
 
 using namespace std;
 

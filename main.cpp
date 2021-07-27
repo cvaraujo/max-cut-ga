@@ -72,14 +72,11 @@ double initialPopulationGeneticAlgorithm(Graph *graph, int timeLimit, int popula
   cout << "Initial Constrained population with size " << populationSize << endl;
   cout << "Generating " << newIndividuals << " new individuals per generation" << endl;
   cout << "Running by " << timeLimit << " seconds" << endl;
-  cout << "The fittest individual at 1th generation have " << population->getFittest()->getFitness() << " of fitness"
-       << endl;
+  cout << "The fittest individual at 1th generation have " << population->getFittest()->getFitness() << " of fitness" << endl;
 
   solution << populationSize << " " << newIndividuals << " " << timeLimit << endl;
   solution << population->getFittest()->getFitness() << endl;
-  //    for (int i = 0; i < populationSize; i++) cout << population->getIndividual(i)->getFitness() << endl;
-  //    cout << chrono::duration_cast<chrono::seconds>(end - start).count() << endl;
-  //    getchar();
+  
   while (chrono::duration_cast<chrono::seconds>(end - start).count() < timeLimit) {
     Algorithm::defaultEvolvePopulation(population, newIndividuals);
     generations++;
@@ -147,14 +144,9 @@ double hybridGeneticAlgorithm(Graph *graph, int timeLimit, int populationSize, i
   solution << populationSize << " " << newIndividuals << " " << timeLimit << endl;
   solution << population->getFittest()->getFitness() << endl;
   population->sortPopulation();
-    
+
   while (chrono::duration_cast<chrono::seconds>(end - start).count() < timeLimit) {
     Algorithm::hybridEvolvePopulation(population, newIndividuals);
-    cout << population->getFittest()->getFitness() << endl;
-    //for (int i = 0; i < population->getSize(); i++)
-    //cout << population->getIndividual(i)->getFitness() << ", ";
-    //cout << endl;
-    //getchar();
     generations++;
     end = chrono::steady_clock::now();
   }
@@ -171,20 +163,13 @@ int main(int argc, const char *argv[]) {
     cout << "Wrong number of parameters" << endl;
     cout << "Usage:.\\GA <variation> <population-size> <new-at-generation> "
       "<time-limit> <instance-file-name> <result-file-name>" << endl;
-    cout
-      << "--------------------------\nVariations:\ndf = Default GA\nip = Initial Population\nmt = Mutation\nhy = "
+    cout << "--------------------------\nVariations:\ndf = Default GA\nip = Initial Population\nmt = Mutation\nhy = "
       "Hybrid version\n--------------------------" << endl;
     exit(0);
   } else {
-    // srand(time(NULL));
-    // srand48(time(NULL));
-    stringstream convSr(argv[7]), convS(argv[8]);
-    int t1, t2;
-    convSr >> t1;
-    convS >> t2;
-    
-    srand(t1);
-    srand48(t2);
+    srand(time(NULL));
+    srand48(time(NULL));
+
     string variation_df = "df", variation_ip = "ip", variation_mt = "mt", variation_hy = "hy", instanceFile, result;
     int time = 0, populationSize = 0, newIndividuals = 0;
     double solution = 0;

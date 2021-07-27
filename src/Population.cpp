@@ -58,28 +58,20 @@ Individual *Population::getFittest() {
 void Population::getOnly(int popSize, int newInd) {
   sort(population.begin(), population.end(), [](Individual *i1, Individual *i2) { return i1->getFitness() > i2->getFitness(); });
 
+  Individual *ind = new Individual(*population[0]);
+
+  // cout << ind->getFitness() << endl;
+
+  population.erase(population.begin(), population.begin()+newInd-1);
   population.erase(population.begin() + (popSize - newInd), population.end());
-  /*
-  vector<Individual *> aux(population.begin() + (popSize - newInd), population.end());
-  int i, countInserted = 0;
 
-  sort(aux.begin(), aux.end(), [](Individual *i1, Individual *i2) { return i1->getFitness() > i2->getFitness(); });
+  population[0] = ind;
 
-  population.erase(population.begin() + (popSize - 2 * newInd), population.end());
+  for(int i = 0; i < newInd; i++)
+    population.push_back(new Individual(population[1]->graph, true, true));
 
-  double lastFitness = 0;
-
-  for (i = 0; i < int(aux.size()); i++) {
-    if (aux[i]->getFitness() != lastFitness && aux[i]->getFitness() != aux[0]->getFitness()) {
-      countInserted++, lastFitness = aux[i]->getFitness();
-      population.push_back(aux[i]);
-    }
-  }
-
-  for (i = 0; i < (newInd - countInserted); i++) {
-    population.push_back(new Individual(population[0]->graph, true, true));
-  }
-  */
+  // cout << population[0]->getFitness() << endl;
+  // getchar();
 }
 
 int Population::getSize() {

@@ -5,106 +5,158 @@
 #include "../include/Algorithm.h"
 
 void Algorithm::defaultEvolvePopulation(Population *population, int newInd) {
-  int selected, toMutation = int((population->getSize()) * 0.3), i;
+  int selected, toMutation = int((population->getSize()) * 0.3);
+  int i, j, numIns = 0, p = population->getSize()-1;
+  double worst = population->getIndividual(p)->getFitness(), newFitness;
+  bool push;
+  vector<int> used;
+  vector<int>::iterator it;
 
-  // Crossover to make new individuals
-  for (i = 0; i < newInd; i++)
-    population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
+  for (i = 0; i < newInd; i++) {
+    Individual *ind = multiParentCrossover(population, 2 + int(random() % 3));
+    newFitness = ind->getFitness();
 
-  //    for (i = 1; i < population->getSize(); i++)
-  //        cout << population->getIndividual(i)->getFitness() << ", ";
-  //    cout << endl;
+    if (newFitness > worst) {
+      push = true;
+      for (j = p; j >= 0; j--){
+        if (newFitness == population->getIndividual(j)->getFitness()) {
+          push = false;
+          break;
+        }
+      }
+      if(push) {
+        population->appendIndividual(ind);
+        numIns++;
+      }
+    }
+  }
 
   // Optimization
-  for (i = 0; i < population->getSize() - 1; i++) {
-    localOptimization(population->getIndividual(i));
+  for (i = 0; i < newInd; i++) {
+    selected = 1 + int(random() % (population->getSize()-1));
+    it = find(used.begin(), used.end(), selected);
+
+    if(it != used.end()) i--;
+    else {
+      used.push_back(selected);
+      localOptimization(population->getIndividual(selected));
+    }
   }
-
-  for (i = 0; i < population->getSize() - 1; i++)
-    cout << population->getIndividual(i)->getFitness() << endl;
-
-  getchar();
 
   for (i = 0; i < toMutation; i++) {
-    selected = int(random() % population->getSize());
-    if (selected != 0) defaultMutation(population->getIndividual(selected));
+    selected = 1 + int(random() % (population->getSize()-1));
+    it = find(used.begin(), used.end(), selected);
+
+    if(it != used.end()) i--;
+    else {
+      used.push_back(selected);
+      defaultMutation(population->getIndividual(selected));
+    }
   }
 
-  population->setIndividual(0, population->getFittest());
-  population->getOnly(population->getSize(), newInd);
+  population->getOnly(population->getSize(), numIns);
 }
 
 void Algorithm::constrainedEvolvePopulation(class Population *population, int newInd) {
-  int selected, toMutation = int((population->getSize()) * 0.2);
 
-  // Crossover to make new individuals
-  for (int i = 0; i < newInd; i++)
-    population->appendIndividual(defaultCrossover(tournament(population), tournament(population)));
+  int selected, toMutation = int((population->getSize()) * 0.3);
+  int i, j, numIns = 0, p = population->getSize()-1;
+  double worst = population->getIndividual(p)->getFitness(), newFitness;
+  bool push;
+  vector<int> used;
+  vector<int>::iterator it;
 
-  for (int i = 0; i < toMutation; i++) {
-    selected = int(random() % population->getSize());
-    if (selected != 0)
-      constrainedMutation(population->getIndividual(selected));
+  for (i = 0; i < newInd; i++) {
+    Individual *ind = multiParentCrossover(population, 2 + int(random() % 3));
+    newFitness = ind->getFitness();
+
+    if (newFitness > worst) {
+      push = true;
+      for (j = p; j >= 0; j--){
+        if (newFitness == population->getIndividual(j)->getFitness()) {
+          push = false;
+          break;
+        }
+      }
+      if(push) {
+        population->appendIndividual(ind);
+        numIns++;
+      }
+    }
   }
 
-  population->setIndividual(0, population->getFittest());
+  for (int i = 0; i < toMutation; i++) {
+    selected = 1 + int(random() % (population->getSize()-1));
+    it = find(used.begin(), used.end(), selected);
+
+    if(it != used.end()) i--;
+    else {
+      used.push_back(selected);
+      constrainedMutation(population->getIndividual(selected));
+    }
+  }
   population->getOnly(population->getSize(), newInd);
 }
 
 void Algorithm::hybridEvolvePopulation(class Population *population, int newInd) {
-  int selected, toMutation = int((population->getSize()) * 0.2);
+  int selected, toMutation = int((population->getSize()) * 0.3);
   int i, j, numIns = 0, p = population->getSize()-1;
-  double worst = population->getIndividual(p)->getFitness();
+  double worst = population->getIndividual(p)->getFitness(), newFitness;
   bool push;
-  
+  vector<int> used;
+
   for (i = 0; i < newInd; i++) {
-    Individual *ind = multiParentCrossover(population, 3 + int(random() % 2));
-    localOptimization(ind);
-    
-    if (ind->getFitness() > worst) {
+    Individual *ind = multiParentCrossover(population, 2 + int(random() % 3));
+    newFitness = ind->getFitness();
+
+    if (newFitness > worst) {
       push = true;
-      for (j = 0; j < population->getSize(); j++){
-	if (ind->getFitness() == population->getIndividual(j)->getFitness()) {
-	  push = false;
-	  break;
-	}
+      for (j = p; j >= 0; j--){
+        if (newFitness == population->getIndividual(j)->getFitness()) {
+          push = false;
+          break;
+        }
       }
       if(push) {
-	numIns++;
-	population->appendIndividual(ind);
+        population->appendIndividual(ind);
+        numIns++;
       }
     }
   }
-  
-  // Crossover
-  //for (i = 0; i < newInd; i++)
-  //  population->appendIndividual(multiParentCrossover(population, 3 + int(random() % 2)));
-  
-  //for (i = population->getSize() - newInd; i < population->getSize(); i++) {
-  //  localOptimization(population->getIndividual(i));
-  //}
-  
-  for (i = 0; i < toMutation; i++) {
-    selected = int(random() % population->getSize());
-    if (selected != 0) constrainedMutation(population->getIndividual(selected));
+
+  vector<int>::iterator it;
+
+  for (i = 0; i < 2*toMutation; i++) {
+    selected = 1 + int(random() % (population->getSize()-1));
+    it = find(used.begin(), used.end(), selected);
+
+    if(it != used.end()) i--;
+    else {
+      used.push_back(selected);
+      if(drand48() < 0.5)
+        constrainedMutation(population->getIndividual(selected));
+      else
+        localOptimization(population->getIndividual(selected));
+    }
   }
 
   for (i = 0; i < toMutation; i++) {
-    selected = int(random() % population->getSize());
-    if (selected != 0) defaultMutation(population->getIndividual(selected));
-  }
+    selected = 1 + int(random() % (population->getSize()-1));
+    it = find(used.begin(), used.end(), selected);
 
-  // Eletism on the best individual
-  //population->setIndividual(0, population->getFittest());
+    if(it != used.end()) i--;
+    else {
+      used.push_back(selected);
+      defaultMutation(population->getIndividual(selected));
+    }
+  }
 
   // Remove the excess
   population->getOnly(population->getSize(), numIns);
-  //getchar();
 }
 
 Individual *Algorithm::defaultCrossover(Individual *individual1, Individual *individual2) {
-  auto *child = new Individual(
-			       (individual1->getFitness() > individual2->getFitness()) ? *individual1 : *individual2);
+  auto *child = new Individual((individual1->getFitness() > individual2->getFitness()) ? *individual1 : *individual2);
 
   for (int i = 0; i < individual1->getSize(); i++) {
     if (child->getGene(i) == individual2->getGene(i)) continue;
@@ -119,33 +171,26 @@ Individual *Algorithm::multiParentCrossover(Population *population, int p) {
   int i, j, k, n = population->getIndividual(0)->getSize();
   vector<int> selecteds = vector<int>();
   vector<bool> allocated = vector<bool>(n);
+  int first = 1 + int(random() % int(population->getSize() * 0.1));
 
-  selecteds.push_back(int(random() % population->getSize()));
-  for (k = 1; k < p; k++) {
-    j = int(random() % population->getSize());
-    //cout << j << " - " << find(selecteds.begin(), selecteds.end(), j) != selecteds.end() << endl;
-    if (find(selecteds.begin(), selecteds.end(), j) != selecteds.end())
-      selecteds.push_back(j);
-    else k--;
-  }
-  
-  for (i = 0; i < n; i++) {
-    for (k = 0; k < p; k++) {
-      if (population->getIndividual(selecteds[k])->getGene(i)) {
-	sideOne[k].push_back(i);
-      } else sideZero[k].push_back(i);
-    }
-  }
+  selecteds.push_back(first);
+  selecteds.push_back(population->getSize()-1);
+
+  for (k = first+1; k < p-1; k++)
+    selecteds.push_back(k);
+
+  for (i = 0; i < n; i++)
+    for (k = 0; k < p; k++)
+      if (population->getIndividual(selecteds[k])->getGene(i)) sideOne[k].push_back(i);
+      else sideZero[k].push_back(i);
 
   int smallest = 0, smallestZero = 0, sizeSmallest = sideOne[0].size(), sizeSmallestZero = sideZero[0].size();
 
   for (k = 0; k < p; k++) {
     sort(sideZero[k].begin(), sideZero[k].end());
     sort(sideOne[k].begin(), sideOne[k].end());
-    if (sideOne[k].size() < sizeSmallest)
-      smallest = k, sizeSmallest = sideOne[k].size();
-    if (sideZero[k].size() < sizeSmallestZero)
-      smallestZero = k, sizeSmallestZero = sideZero[k].size();
+    if (sideOne[k].size() < sizeSmallest) smallest = k, sizeSmallest = sideOne[k].size();
+    if (sideZero[k].size() < sizeSmallestZero) smallestZero = k, sizeSmallestZero = sideZero[k].size();
   }
 
   Individual *ind = new Individual(population->getIndividual(smallest)->graph, false, false);
@@ -156,7 +201,7 @@ Individual *Algorithm::multiParentCrossover(Population *population, int p) {
     change = true;
     for (k = 0; k < p; k++) {
       if (sideOne[k][i] != j) {
-	change = false; break;
+        change = false; break;
       }
     }
     if (change) ind->setGene(j), allocated[j] = true;
@@ -167,19 +212,16 @@ Individual *Algorithm::multiParentCrossover(Population *population, int p) {
     change = true;
     for (k = 0; k < p; k++) {
       if (sideZero[k][i] != j) {
-	change = false; break;
+        change = false; break;
       }
     }
     if (change) allocated[j] = true;
   }
 
-  for (i = 0; i < n; i++) {
-    if (!allocated[j])
-      if (drand48() < 0.5)
-	ind->setGene(i);
-  }
+  for (i = 0; i < n; i++)
+    if (!allocated[j] && drand48() < 0.6) ind->setGene(i);
 
-  return ind;  
+  return ind;
 }
 
 void Algorithm::defaultMutation(Individual *individual) {
@@ -188,26 +230,30 @@ void Algorithm::defaultMutation(Individual *individual) {
 }
 
 void Algorithm::localOptimization(Individual *individual) {
-  int j;
-  for (int i = 0; i < (4 * individual->getSize()); i++) {
-    j = int(random() % individual->getSize());
-    if (individual->getChg(j) >= 0) individual->setGene(j);
+  int j, i;
+  vector<pair<int, int>> order;
+
+  for(i = 0; i < individual->getSize(); i++)
+    order.push_back(make_pair(i, individual->getChg(i)));
+
+  sort(order.begin(), order.end(), [] (const pair<int, int> P1, const pair<int, int> P2) {
+                                     return P1.second > P2.second;
+                                   });
+
+  for (i = 0; i < individual->getSize(); i++) {
+    if (individual->getChg(order[i].first) < 0) continue;
+    individual->setGene(order[i].first);
   }
 }
 
 void Algorithm::constrainedMutation(Individual *individual) {
-  int fixed = -1, n = individual->getSize();
-  bool fixVertex;
-
-  fixVertex = drand48() < 0.5;
-  if (fixVertex) fixed = int(random() % n);
-
+  int fixed = int(random() % individual->getSize());
   individual->constrainedMutation(fixed);
 }
 
 Individual *Algorithm::tournament(Population *population) {
   int selected = 0, toReturn = population->getSize() - 1;
-  double best = population->getIndividual(population->getSize() - 1)->getFitness();
+  double best = population->getIndividual(toReturn)->getFitness();
 
   for (int i = 0; i < tournamentSize; i++) {
     selected = int(random() % population->getSize());
